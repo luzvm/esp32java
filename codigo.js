@@ -1,24 +1,23 @@
-const express = require('express');
-const http = require('http');
-const WebSocket = require('ws');
+ const toggleButton = document.getElementById('toggleButton');
+const status = document.getElementById('status');
+let socket;
 
-const app = express();
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+toggleButton.addEventListener('click', () => {
+  if (!socket || socket.readyState === WebSocket.CLOSED) {
+    socket = new WebSocket('ws://localhost:3000');
 
-wss.on('connection', (ws) => {
-  console.log('Cliente conectado.');
+    socket.onopen = () => {
+      status.textContent = 'Conectado';
+      toggleButton.textContent = 'Desconectar';
+      toggleButton.style.backgroundColor = '#dc3545';
+    };
 
-  ws.on('message', (message) => {
-    console.log(`Mensaje recibido: ${message}`);
-    // Puedes agregar aquí lógica para manejar los mensajes recibidos.
-  });
-
-  ws.on('close', () => {
-    console.log('Cliente desconectado.');
-  });
-});
-
-server.listen(3000, () => {
-  console.log('Servidor WebSocket en ejecución en el puerto 3000.');
+    socket.onclose = () => {
+      status.textContent = 'Desconectado';
+      toggleButton.textContent = 'Conectar';
+      toggleButton.style.backgroundColor = '#007BFF';
+    };
+  } else {
+    socket.close();
+  }
 });
