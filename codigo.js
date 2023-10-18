@@ -1,18 +1,18 @@
- const chat = document.getElementById('chat');
-const messageInput = document.getElementById('messageInput');
-const sendButton = document.getElementById('sendButton');
-const socket = new WebSocket('ws://localhost:3000');
+ // server.js
+const WebSocket = require('ws');
 
-socket.onmessage = (event) => {
-  const message = event.data;
-  chat.innerHTML += `<p>${message}</p>`;
-  chat.scrollTop = chat.scrollHeight;
-};
+const wss = new WebSocket.Server({ port: 8080 });
 
-sendButton.addEventListener('click', () => {
-  const message = messageInput.value;
-  if (message) {
-    socket.send(message);
-    messageInput.value = '';
-  }
+wss.on('connection', function connection(ws) {
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+    
+    // Envía el mensaje a todos los clientes conectados
+    wss.clients.forEach(function each(client) {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
+    
+  });
 });
