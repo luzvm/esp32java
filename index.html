@@ -1,70 +1,37 @@
- <!-- index.html -->
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Chat Websocket</title>
-  <link rel="stylesheet" href="styles.css">
+    <title>Geolocalización</title>
+    <script >
+        document.addEventListener("DOMContentLoaded", function () {
+            const ubicacionParrafo = document.getElementById("ubicacion");
+            const btnMiUbicacion = document.getElementById("btn-mi-ubicacion");
+
+            btnMiUbicacion.addEventListener("click", obtenerUbicacionActual);
+
+            function obtenerUbicacionActual() {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        ubicacionParrafo.textContent = `Tu ubicación actual es: Latitud ${latitude}, Longitud ${longitude}`;
+                    }, function (error) {
+                        ubicacionParrafo.textContent = "No se pudo obtener la ubicación.";
+                    });
+                } else {
+                    ubicacionParrafo.textContent = "Tu navegador no admite geolocalización.";
+                }
+            }
+        });
+
+    </script>
 </head>
 <body>
+<h1>Mi Ubicación</h1>
+<p id="ubicacion">Presiona el botón para obtener tu ubicación.</p>
 
-  <div id="chat">
-    <div id="chat-messages"></div>
-    
-    <div id="chat-form">
-      <textarea id="message"></textarea>
-      <button id="send">Enviar</button>
-    </div>
-    
-    <div id="status">Desconectado</div>
-    <button id="connect">Conectar</button>
-    <button id="disconnect">Desconectar</button>
-    
-  </div>
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    let socket = io();
-
-    // Lógica para conectar/desconectar
-    let connectBtn = document.getElementById('connect');
-    let disconnectBtn = document.getElementById('disconnect');
-
-    connectBtn.addEventListener('click', function() {
-      socket.connect();
-    });
-
-    disconnectBtn.addEventListener('click', function() {
-      socket.disconnect();
-    });
-
-    // Escuchar eventos
-    socket.on('connect', function() {
-      document.getElementById('status').innerText = 'Conectado';
-    });
-
-    socket.on('disconnect', function() {
-      document.getElementById('status').innerText = 'Desconectado';
-    });
-
-    // Enviar mensajes
-    let sendBtn = document.getElementById('send');
-    let messageInput = document.getElementById('message');
-    sendBtn.addEventListener('click', function() {
-      socket.emit('message', messageInput.value);
-      messageInput.value = '';
-    });
-
-    // Recibir mensajes
-    socket.on('message', function(msg) {
-      let messages = document.getElementById('chat-messages');
-      let item = document.createElement('li');
-      item.textContent = msg;
-      messages.appendChild(item);
-      window.scrollTo(0, document.body.scrollHeight);
-    });
-
-  </script>
-
+<button id="btn-mi-ubicacion">Mi Ubicación</button>
 </body>
 </html>
+
